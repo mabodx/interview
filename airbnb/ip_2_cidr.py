@@ -41,7 +41,7 @@ def ip_2_cidr(start_ip, end_ip):
         diff_bits = int(math.log(diff, 2))
         same_bits = 32 - diff_bits
         cidr_bits = max(same_bits, valid_bits)
-        print 'bit: ', same_bits , valid_bits
+        # print 'bit: ', same_bits , valid_bits
 
         cidrs.append(num_2_ip(start) + '/' + str(cidr_bits))
         start += 2 ** (32 - cidr_bits)
@@ -52,4 +52,7 @@ print ip_2_cidr('128.0.0.4', '128.0.0.7')
 
 print ip_2_cidr('255.0.0.7', '255.0.0.19')
 
-print ip_2_cidr('1.1.1.0', '1.1.1.7')
+print ip_2_cidr('1.1.1.0', '1.1.1.0')
+
+
+print ip_2_cidr('255.255.255.255', '255.255.255.255')
