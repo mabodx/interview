@@ -6,7 +6,31 @@
 #include <algorithm>
 #include <queue>
 #include <unordered_map>
+#include <map>
 using namespace std;
+
+class node {
+public:
+    node(){}
+    node (string d, int a, int b, string q){
+        s = d;
+        g = a;
+        h = b;
+        f = g+h;
+        pre = q;
+    }
+    string s;
+    string pre;
+    int g,f, h;
+};
+
+class cmp {
+public:
+    bool operator ()(const node a, const node b) const{
+        return a.f > b.f;
+    }
+};
+
 
 int dx[4] = {0,-1,0,1};
 int dy[4] = {1,0,-1,0};
@@ -32,6 +56,7 @@ int get(int x, int y) {
 void print(string s) {
     for (int i = 0; i < n; i++) {
         for (int j = 0 ; j < n; j++) {
+
             cout << s[i*n+j];
         }
         cout <<endl;
@@ -39,37 +64,50 @@ void print(string s) {
     cout <<endl;
 }
 
-bool dfs(string& s, string& t, unordered_map<string, int>& mp, int& find) {
+int calh(string s) {
+    int res;    
+    for(int i=0;i<9;i++){
+        if(s[i]==' ')
+            continue;
+        char a = '1' + i;
+        if(s[i]!=a){
+            res ++;
+        }
+    }
+    return res;
+}
 
-    
+bool bfs(string& s, string& t, map<string, node>& mp) {    
     if (s == t) {
-        find = 1;
         print (s);
         return true;
     } 
-    mp[s] =1;
+    node a= node(s, 0, 0, "");
+    mp[s] = a;
     
     
-    queue<string> q;
-    q.push(s);
+    priority_queue<node, vector<node>, cmp> q;
+    q.push(node(s, 0, 0, ""));
     
     
     while(!q.empty()) {
+        node top = q.top();
+        q.pop();
+        
+        s = top.s;
         pair<int, int> now = findd(s);
-        s = q.front();
         if (t == s) {
             return true;
         }
-        mp[s] = 1;
-        q.pop();
+        string pre = s;
         for (int i = 0; i < 4; i++) {
             int x = dx[i] + now.first;
             int y = dy[i] + now.second;
             if (valid(x,y)){
                 swap(s[get(x,y)], s[get(now.first, now.second)]);
-                if (mp[s] == 0) {
-                    q.push(s);
-                    
+                if (mp.find(s) == mp.end()) {
+                    q.push(node(s,top.g+1,calh(s), pre));
+                    mp[s] =node(s,top.g+1,calh(s), pre);   
                 }
                 swap(s[get(x,y)], s[get(now.first, now.second)]);
             }
@@ -81,16 +119,23 @@ bool dfs(string& s, string& t, unordered_map<string, int>& mp, int& find) {
 void solve(string s) {
     string t = "12345678 ";
     
-    unordered_map<string, int> mp;
-    int find = 0;
+    map<string, node> mp;
     cout << s <<endl;
-    cout << dfs(s, t, mp, find);
+    cout << bfs(s, t, mp) <<endl;;
+    
+    while(t!="") {
+        print(t);
+        t = mp[t].pre;
+        cout <<endl;
+    }
+    
     cout << "end" <<endl;
 }
 
 int main() {
     
-    string b = " 57681235 ";
+    string b = "87654321 ";
     solve(b);
     return 0;
 }
+
